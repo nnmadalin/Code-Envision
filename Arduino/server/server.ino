@@ -24,7 +24,7 @@ AESLib aes;
 unsigned long duration1;
 unsigned long duration2;
 unsigned long starttime;
-unsigned long sampletime_ms = 1000;
+unsigned long sampletime_ms = 10000;
 unsigned long lowpulseoccupancy1 = 0;
 unsigned long lowpulseoccupancy2 = 0;
 float ratio1 = 0;

@@ -1,0 +1,74 @@
+.map{
+   width: 100%;
+   height: calc(100% - 80px);
+}
+.sensors{
+   padding: 20px 30px;
+   width: calc(100% - 60px);
+
+   display: flex;
+   flex-wrap: wrap;
+   flex-direction: column;
+   gap: 20px;
+}
+.sensors h1{
+   text-align: center;
+   font-size: 35px;
+}
+.sensors .contain{
+   width: 100%;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   flex-wrap: wrap;
+   gap: 50px;
+}
+.sensors .contain .cards{
+   padding: 30px;
+   width: 100%;
+   max-width: 400px;
+   height: 200px;
+   border-radius: 10px;
+   background-color: #8e9bbe;
+   box-shadow: 0px 0px 25px 5px rgba(0, 0, 0, 0.2);
+
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   flex-direction: column;
+   text-align: center;
+
+   word-wrap: break-word;
+}
+.sensors .contain .cards h1{
+   font-size: 30px;
+}
+.sensors .contain .cards .row{
+   width: 100%;
+}
+.sensors .contain .cards .row:nth-child(3){
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   gap: 20px;
+   flex-direction: row;
+
+}
+.sensors .contain .cards button, .sensors .contain .cards a{
+   flex: 1 1;
+   padding: 15px 30px;
+   border: none;
+   border-radius: 10px;
+   background-color: #b5bfdf;
+   box-shadow: 0px 0px 25px 5px rgba(0, 0, 0, 0.15);
+   cursor: pointer;
+   font-size: 15px;
+   font-weight: bold;
+   transition: all 0.3s;
+   text-decoration: none;
+   color: black;
+}
+.sensors .contain .cards button:hover, .sensors .contain .cards a:hover{
+   scale: 1.05;
+   box-shadow: 0px 0px 25px 5px rgba(0, 0, 0, 0.2);
+}
