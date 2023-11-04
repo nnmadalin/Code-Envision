@@ -9,6 +9,7 @@
 #define MQPIN 34
 #define  POLpin1 23
 #define  POLpin2 22
+#define  AUTH_POST_ADD_DATA MjDzfovbksyIcIKmc2wTxE-guLfsxYNeM1Izr?MDt!U/p3ISW2zmda7djNTEmv6ku5YBlo6/qObat2jLirC1dTPHTFigWAcysLNFD7KgHQokqLYHmAV2XrOq-KoTRMSo
 
 DHT dht(DHTPIN, DHTTYPE);
 
