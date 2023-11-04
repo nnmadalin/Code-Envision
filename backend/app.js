@@ -4,7 +4,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const cors = require('cors');
 
-var addDataRouter = require('./routes/add_data');
+var valuesRouter = require('./routes/values');
+var devicesRouter = require('./routes/devices');
 var errorRouter = require('./routes/error');
 
 const releaseConnection = require('./components/releaseConnection')
@@ -20,7 +21,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(releaseConnection);
-app.use('/add_data', addDataRouter);
+app.use('/values', valuesRouter);
+app.use('/devices', devicesRouter);
 app.use('/*', errorRouter);
 
 module.exports = app;
