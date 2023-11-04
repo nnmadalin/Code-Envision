@@ -24,7 +24,7 @@ AESLib aes;
 unsigned long duration1;
 unsigned long duration2;
 unsigned long starttime;
-unsigned long sampletime_ms = 3000;
+unsigned long sampletime_ms = 1000;
 unsigned long lowpulseoccupancy1 = 0;
 unsigned long lowpulseoccupancy2 = 0;
 float ratio1 = 0;
@@ -32,16 +32,14 @@ float ratio2 = 0;
 float concentration1 = 0;
 float concentration2 = 0;
 
-DynamicJsonDocument data(1024);
-DynamicJsonDocument tokenJson(1024);
 String output;
 
 Preferences preferences;
 
+DynamicJsonDocument data(2048);
 
 const char* ssid = "iPhone - Madalin";
 const char* password = "Madalin123";
-String token_now = "";
 
 void setup() {
   dht.begin();
@@ -52,13 +50,9 @@ void setup() {
   pinMode(5,INPUT);
 
   preferences.begin("credentials", false);
-  preferences.putString("token", "aZaV6wLfhEN4AdZXAlZ8PZMhw1rbHRn2C2OdkuA785RfrM02bKkUt95Bu1oB0YZX2M4n4atBfofdVxpWOVuqwLJqmmsOpzAdWVdUD2PuYyL4EboOGNnyedLOeZjIrHzr7Bt6qkEKJ0WvXuUDoJNTU0W2IGaByLcVg5h8hM0b8T5kdI9VOCspsF5ApmIIg8x5Ray71HwTNXy4rEZJoNFuteX5iwkcnXZQUlrM1PkDjQQWMlGKVeTw6YCGAfygEgj3"); 
-  
-  token_now = preferences.getString("token", "");
-  token_now = "aZaV6wLfhEN4AdZXAlZ8PZMhw1rbHRn2C2OdkuA785RfrM02bKkUt95Bu1oB0YZX2M4n4atBfofdVxpWOVuqwLJqmmsOpzAdWVdUD2PuYyL4EboOGNnyedLOeZjIrHzr7Bt6qkEKJ0WvXuUDoJNTU0W2IGaByLcVg5h8hM0b8T5kdI9VOCspsF5ApmIIg8x5Ray71HwTNXy4rEZJoNFuteX5iwkcnXZQUlrM1PkDjQQWMlGKVeTw6YCGAfygEgj3";
-  
+  //preferences.putString("token", "aZaV6wLfhEN4AdZXAlZ8PZMhw1rbHRn2C2OdkuA785RfrM02bKkUt95Bu1oB0YZX2M4n4atBfofdVxpWOVuqwLJqmmsOpzAdWVdUD2PuYyL4EboOGNnyedLOeZjIrHzr7Bt6qkEKJ0WvXuUDoJNTU0W2IGaByLcVg5h8hM0b8T5kdI9VOCspsF5ApmIIg8x5Ray71HwTNXy4rEZJoNFuteX5iwkcnXZQUlrM1PkDjQQWMlGKVeTw6YCGAfygEgj3"); 
+
   starttime = millis();
-  Serial.println(token_now);
 
   WiFi.begin(ssid, password);
   Serial.println("Conectare");
@@ -75,26 +69,13 @@ void setup() {
   Serial.print("IP ESP: ");
   Serial.println(WiFi.localIP());
 
-
-
   Serial.println("");Serial.println("");  
 
-  pol();
+  //pol();
 }
 
-void get_hum_temp_MQ(){
-    float humi = dht.readHumidity();
-    float tempC = dht.readTemperature();
-    int MQvalue = analogRead(MQPIN);
 
-    data["humidity"] = humi;
-    data["temperature"] = tempC;
-    data["MQvalue"] = MQvalue;
-
-    Serial.println("Umiditate: " + String(humi) + "   -   Temperatura: "  + String(tempC) + "   -   MQ value: "  + String(MQvalue));
-}
-
-void pol(){
+void loop() {
   duration1 = pulseIn(POLpin1, LOW);
   duration2 = pulseIn(POLpin2, LOW);
   lowpulseoccupancy1 = lowpulseoccupancy1+duration1;
@@ -102,7 +83,20 @@ void pol(){
 
   if ((millis()-starttime) > sampletime_ms)
   {
-    get_hum_temp_MQ();
+    DynamicJsonDocument data(2048);
+    data["token"] = preferences.getString("token", "");
+    data["mac"] = String(WiFi.macAddress());
+    
+    float humi = dht.readHumidity();
+    float tempC = dht.readTemperature();
+    int MQvalue = analogRead(MQPIN);
+
+    data["humidity"] = String(humi);
+    data["temperature"] = String(tempC);
+    data["mqvalue"] = String(MQvalue);
+
+    Serial.println("Umiditate: " + String(humi) + "   -   Temperatura: "  + String(tempC) + "   -   MQ value: "  + String(MQvalue));
+
 
     ratio1 = lowpulseoccupancy1/(sampletime_ms*10.0);  
     concentration1 = 1.1*pow(ratio1,3)-3.8*pow(ratio1,2)+520*ratio1+0.62; 
@@ -115,33 +109,40 @@ void pol(){
     starttime = millis();
 
     output = "";
-    data["PM2.5"] = concentration1;
-    data["PM1.0"] = concentration2;
+    data["pm25"] = String(concentration1);
+    data["pm1"] = String(concentration2);
 
     if(WiFi.status()== WL_CONNECTED){
       HTTPClient http;   
 
-      data["mac"] = WiFi.macAddress();
-      data["token"] = token_now;
-
 
       serializeJson(data, output);
+      Serial.println("");
+      Serial.println(output);
+      Serial.println("");
 
       http.begin("http://172.20.10.4:3003/values");  
       http.addHeader("Content-Type", "application/json; charset=utf-8");        
       
-      //Serial.print(output);
       int httpResponseCode = http.POST(output);  
       
-      if(httpResponseCode>0){
+      if(httpResponseCode>0 && httpResponseCode == 201){
       
         String response = http.getString();                     
 
+        while(response.isEmpty()) {
+          delay(1000); 
+          response = http.getString();
+        }
+        while(data["token"] != response){
+          data["token"] = response;
+          preferences.putString("token", response);
+        }
+        
+        Serial.println("");
         Serial.println(httpResponseCode);
         Serial.println(response);
-
-        token_now = response;
-        preferences.putString("token", token_now);
+        
       }else{
       
         Serial.print("Error on sending POST: ");
@@ -154,9 +155,5 @@ void pol(){
 
     
   }
-}
-
-void loop() {
-  pol();  
 
 }
