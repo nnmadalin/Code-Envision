@@ -7,6 +7,7 @@ const cors = require('cors');
 var valuesRouter = require('./routes/values');
 var devicesRouter = require('./routes/devices');
 var errorRouter = require('./routes/error');
+var loginRouter = require('./routes/login');
 
 const releaseConnection = require('./components/releaseConnection')
 
@@ -23,6 +24,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(releaseConnection);
 app.use('/values', valuesRouter);
 app.use('/devices', devicesRouter);
+app.use('/login', loginRouter);
 app.use('/*', errorRouter);
 
 module.exports = app;

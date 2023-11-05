@@ -11,10 +11,10 @@ function Navbar() {
                <p>-Air Quality in Ploiesti-</p>
             </div>
             <div className={styles.right}>
-               <a href='./'>
+               <a href='/'>
                   Home
                </a>
-               <a href='#'>
+               <a href='/admin'>
                   Login
                </a>
             </div>

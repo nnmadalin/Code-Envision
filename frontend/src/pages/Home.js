@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef  } from 'react';
 import styles from '../css/Home.module.css';
 import { MapContainer, TileLayer, Marker, Popup} from 'react-leaflet';
 import leaflet from 'leaflet';
-import { Chart, Series } from 'devextreme-react/chart';
+import { Chart, Series, ArgumentAxis, Label } from 'devextreme-react/chart';
 
 import 'leaflet/dist/leaflet.css';
 
@@ -11,16 +11,26 @@ function Home() {
   const mapRef = useRef(null);
   const[dataFetch, setDataFetch] = useState(undefined);
   const[data, setData] = useState(undefined);
-  const[menuUUID, setMenuUUID] = useState(undefined);
+  const[menuUUID, setMenuUUID] = useState(0);
   const[isActiveMenu, setIsActiveMenu] = useState(false);
 
   const[dataSourceChart1, setDataSourceChart1] = useState([]);
+  const[dataSourceChart2, setDataSourceChart2] = useState([]);
+  const[dataSourceChart3, setDataSourceChart3] = useState([]);
+  const[dataSourceChart4, setDataSourceChart4] = useState([]);
 
   const[lastPM10, setlastPM10] = useState(0);
+  const[lastPM25, setlastPM25] = useState(0);
+  const[CAQIFront, setCAQIFront] = useState(0);
+  const[c02Front, setC02Front] = useState(0);
+  const[tempFront, settempFront] = useState(0);
+  const[humFront, sethumFront] = useState(0);
+  const[streetFront, setstreetFront] = useState(undefined);
+  const[latFront, setLatFront] = useState(undefined);
+  const[longFront, setLongFront] = useState(undefined);
+  
 
-
-  var IAQIs = [];
-  var CAQI = "";
+  
 
   const center = [44.9388, 26.0247];
   const ploiestiBounds = [
@@ -68,28 +78,24 @@ function Home() {
     iconAnchor: [16, 32],
     popupAnchor: [0, -32]
   });
-
   const customIcon_orange = new leaflet.Icon({
     iconUrl: "https://t4.ftcdn.net/jpg/03/29/19/15/360_F_329191596_tRQiV7LZjTZtuPM09QyOS09HV1D9VimE.jpg",
     iconSize: [20, 20],
     iconAnchor: [16, 32],
     popupAnchor: [0, -32]
   });
-
   const customIcon_red = new leaflet.Icon({
     iconUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Red_Color.jpg/1536px-Red_Color.jpg",
     iconSize: [20, 20],
     iconAnchor: [16, 32],
     popupAnchor: [0, -32]
   });
-
   const customIcon_green = new leaflet.Icon({
     iconUrl: "https://htmlcolorcodes.com/assets/images/colors/light-green-color-solid-background-1920x1080.png",
     iconSize: [20, 20],
     iconAnchor: [16, 32],
     popupAnchor: [0, -32]
   });
-
   const customIcon_purple = new leaflet.Icon({
     iconUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYceTuCriHMbYRfZAUhMpyoGLxOmKQzmpOEzpTAQcdOFf0_bBejIWVrZ1W8ic3RLt1kMQ&usqp=CAU",
     iconSize: [20, 20],
@@ -123,7 +129,6 @@ function Home() {
     }
     return IAQI;
   }
-
   function calculateCAQI(IAQIs) {
     if (IAQIs.length === 0) {
       return null;
@@ -134,10 +139,101 @@ function Home() {
   const handlePopupOpen = (uuid) => {
     setMenuUUID(uuid);
     setIsActiveMenu(true);
+    load_menu_fetch(uuid);
   };
 
   const handleCloseMenu = () => {
     setIsActiveMenu(false);
+  }
+
+  function load_menu_fetch (uuid){
+    var IAQIs = [];
+    var hum = 0, counter = 0;
+    var temp = 0;
+    var co2 = 0;
+
+    dataFetch && dataFetch.map((object, key ) => {
+      if(object.uuid = uuid){
+        setstreetFront(object.street);
+        setLatFront(object.lat);
+        setLongFront(object.longi);
+      }
+    });
+
+    data && data.map((object2, key2 ) => {
+      var date = new Date(object2.added_on);
+      
+      if(object2.uuid === uuid){
+        if(date.getFullYear() === (new Date()).getFullYear() &&
+          date.getMonth() === (new Date()).getMonth() &&
+          date.getDate() === (new Date()).getDate() - 1)
+        {
+          const IAQI_PM10 = calculateIAQI_PM10(parseInt(object2.pm1) / 1000);
+          const IAQI_PM25 = calculateIAQI_PM25(parseInt(object2.pm25)  / 1000);
+
+          IAQIs.push(IAQI_PM10, IAQI_PM25);
+          if(IAQI_PM10 > 0)
+            setlastPM10(IAQI_PM10);
+          if(IAQI_PM25 > 0)
+            setlastPM25(IAQI_PM25);
+
+          hum += parseInt(object2.humidity);
+          temp += parseInt(object2.temperature);
+          co2 += parseInt(object2.mqvalue);
+          counter++;
+        }
+      }
+    });
+
+    
+
+    for(let i = 0; i < 24; i++){
+      let tempmed = 0, hummed = 0, co2med = 0, coutnerchart = 0;
+      let IAQIschart = [];
+      data && data.map((object2, key2 ) => {
+        var date = new Date(object2.added_on);
+        if(object2.uuid === uuid){
+          if(date.getFullYear() === (new Date()).getFullYear() &&
+            date.getMonth() === (new Date()).getMonth() &&
+            date.getDate() === (new Date()).getDate() - 1 &&
+            date.getHours() === i
+            )
+          {
+            
+            const IAQI_PM10 = calculateIAQI_PM10(parseInt(object2.pm1) / 1000);
+            const IAQI_PM25 = calculateIAQI_PM25(parseInt(object2.pm25)  / 1000);
+
+            IAQIschart.push(IAQI_PM10, IAQI_PM25);
+
+            hummed += parseInt(object2.humidity);
+            tempmed += parseInt(object2.temperature);
+            co2med += parseInt(object2.mqvalue);
+            coutnerchart++;
+          }
+        }
+      });
+      hummed /= coutnerchart;
+      tempmed /= coutnerchart;
+      co2med /= coutnerchart;
+
+      const CAQIchart = calculateCAQI(IAQIschart);
+      setDataSourceChart1(prevData => [...prevData, {value: CAQIchart, hours: i}]);
+      setDataSourceChart2(prevData => [...prevData, {value: tempmed, hours: i}]);
+      setDataSourceChart3(prevData => [...prevData, {value: hummed, hours: i}]);
+      setDataSourceChart4(prevData => [...prevData, {value: co2med, hours: i}]);
+    }
+
+    hum /= counter;
+    temp /= counter;
+    co2 /= counter;
+
+    setC02Front(parseFloat(co2));
+    sethumFront(parseFloat(hum));
+    settempFront(parseFloat(temp));
+    
+    const CAQI = calculateCAQI(IAQIs);
+
+    setCAQIFront(CAQI);
   }
 
   return (
@@ -177,13 +273,16 @@ function Home() {
               }
             });
             
-            const CAQI = calculateCAQI(IAQIs);
-            
-            if(CAQI > 0 && CAQI != undefined){
-              return (
-                <Marker id = {object.uuid} key={key}  eventHandlers={{ click: (e) => { handlePopupOpen(object.uuid)}}} position={[object.lat, object.longi]} icon={CAQI <= 25 ? customIcon_green : CAQI <= 50 ? customIcon_yellow : CAQI <= 75 ? customIcon_orange: CAQI <= 100 ? customIcon_red : customIcon_purple}>
-                </Marker>
-              );
+            if(IAQIs.length != 0){
+
+              const CAQI = calculateCAQI(IAQIs);
+              
+              if(CAQI > 0 || CAQI != null){
+                return (
+                  <Marker id = {object.uuid} key={key}  eventHandlers={{ click: (e) => { handlePopupOpen(object.uuid)}}} position={[object.lat, object.longi]} icon={CAQI <= 25 ? customIcon_green : CAQI <= 50 ? customIcon_yellow : CAQI <= 75 ? customIcon_orange: CAQI <= 100 ? customIcon_red : customIcon_purple}>
+                  </Marker>
+                );
+              }
             }
             
           })
@@ -191,40 +290,18 @@ function Home() {
       </MapContainer>
       
       {
-        menuUUID && isActiveMenu === true && (
+        menuUUID !== 0 && isActiveMenu === true && (
           <div className={styles.menu}>
             <button onClick={handleCloseMenu} className={styles.menuClose}>X</button>
 
-            {  
-              data && data.map((object2, key2 ) =>{
-                var date = new Date(object2.added_on);
-                
-                if(object2.uuid === menuUUID){
-                  if(date.getFullYear() === (new Date()).getFullYear() &&
-                    date.getMonth() === (new Date()).getMonth() &&
-                    date.getDate() === (new Date()).getDate() - 1)
-                  {
-                    const IAQI_PM10 = calculateIAQI_PM10(parseInt(object2.pm1) / 1000);
-                    const IAQI_PM25 = calculateIAQI_PM25(parseInt(object2.pm25)  / 1000);
-
-                    IAQIs.push(IAQI_PM10, IAQI_PM25);
-                  }
-                }
-              })
-            }
-
             {
-
-              CAQI = calculateCAQI(IAQIs)
-            }
-
-            {
-              lastPM10 && (
+              lastPM10 !== 0 && lastPM25 !== 0 && (
                 <>
                   <div className={styles.top}>
-                    <h1>Regina Maria Dorohoi Botosani</h1>
+                    <h1>{streetFront}</h1>
+                    <p>Latitudine: {latFront} Longitudine: {longFront}</p>
                     <div className={styles.info}>
-                      <h2>15</h2>
+                      <h2>{Number(CAQIFront).toFixed(0)}</h2>
                       <h3>Airly CAQI</h3>
                     </div>
                   </div>
@@ -236,43 +313,89 @@ function Home() {
                       <h3 className={styles.title}>Particule</h3>
                       <div className={styles.info}>
                         <p>PM10</p>
-                        <p>{(lastPM10 / 50) * 100}% <span><h3>{lastPM10}</h3>  <p>µg/m³</p></span></p>
+                        <p>{Number((lastPM10 / 50) * 100).toFixed(2)}% <span><h3> {Number(lastPM10).toFixed(2)}</h3>  <p>µg/m³</p></span></p>
                       </div>
                     </div>
                     <div className={styles.section}>
                       <div className={styles.info}>
                         <p>PM25</p>
-                        <p>29% <span><h3>14</h3>  <p>µg/m³</p></span></p>
+                        <p>{Number((lastPM25/ 50) * 100).toFixed(2)}% <span><h3> {Number(lastPM25).toFixed(2)}</h3>  <p>µg/m³</p></span></p>
                       </div>
                     </div>
                     <div className={styles.section}>
                       <div className={styles.info}>
                         <p>CO<sub>2</sub></p>
-                        <p>29</p>
+                        <p>{Number(c02Front).toFixed(2)}</p>
                       </div>
                     </div>
                     <div className={styles.sectionSpecial}>
                       <div className={styles.info}>
                         <p>Umid</p>
-                        <p>29%</p>
+                        <p>{Number(humFront).toFixed(2)}%</p>
                       </div>
                     </div>
                     <div className={styles.sectionSpecial}>
                       <div className={styles.info}>
                         <p>Temp</p>
-                        <p>29°C</p>
+                        <p>{Number(tempFront).toFixed(2)}°C</p>
                       </div>
                     </div>
                     <div className={styles.section}>
-                      <h3 className={styles.title + " " + styles.titleSpecial1}>Prognoza calitatii aerului</h3>
+                      <h3 className={styles.title + " " + styles.titleSpecial2}>Grafic CAQI</h3>
                       <div className={styles.info}>
-                      <Chart className={styles.chart} dataSource={dataSourceChart1}>
+                      <Chart className={styles.chart} dataSource={dataSourceChart1} >
                         <Series
                           valueField="value"
                           argumentField="hours"
                           name="CAQI"
                           type="bar"
                           color="#818FB4" />
+                        <ArgumentAxis showLabels={true} tickInterval={1}/> 
+                      </Chart>
+                      </div>
+                    </div>
+
+                    <div className={styles.section}>
+                      <h3 className={styles.title + " " + styles.titleSpecial3}>Grafic temperatura</h3>
+                      <div className={styles.info}>
+                      <Chart className={styles.chart} dataSource={dataSourceChart2}>
+                        <Series
+                          valueField="value"
+                          argumentField="hours"
+                          name="Temp"
+                          type="bar"
+                          color="#818FB4" />
+                        <ArgumentAxis showLabels={true} tickInterval={1}/> 
+                      </Chart>
+                      </div>
+                    </div>
+
+                    <div className={styles.section}>
+                      <h3 className={styles.title + " " + styles.titleSpecial4}>Grafic umiditate</h3>
+                      <div className={styles.info}>
+                      <Chart className={styles.chart} dataSource={dataSourceChart3}>
+                        <Series
+                          valueField="value"
+                          argumentField="hours"
+                          name="Umid"
+                          type="bar"
+                          color="#818FB4" />
+                        <ArgumentAxis showLabels={true} tickInterval={1}/> 
+                      </Chart>
+                      </div>
+                    </div>
+
+                    <div className={styles.section}>
+                      <h3 className={styles.title + " " + styles.titleSpecial5}>Grafic CO2</h3>
+                      <div className={styles.info}>
+                      <Chart className={styles.chart} dataSource={dataSourceChart4}>
+                        <Series
+                          valueField="value"
+                          argumentField="hours"
+                          name="Co2"
+                          type="bar"
+                          color="#818FB4" />
+                        <ArgumentAxis showLabels={true} tickInterval={1}/> 
                       </Chart>
                       </div>
                     </div>
@@ -280,7 +403,6 @@ function Home() {
                 </>
               )
             }
-            
           </div>
         )
       }

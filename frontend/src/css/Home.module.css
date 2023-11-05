@@ -97,6 +97,18 @@
 .menu .middle .titleSpecial1::before{
    width: calc(100% - 210px);
 }
+.menu .middle .titleSpecial2::before{
+   width: calc(100% - 110px);
+}
+.menu .middle .titleSpecial3::before{
+   width: calc(100% - 170px);
+}
+.menu .middle .titleSpecial4::before{
+   width: calc(100% - 140px);
+}
+.menu .middle .titleSpecial5::before{
+   width: calc(100% - 100px);
+}
 .menu .middle .info{
    max-width: 100%;
    display: flex;
