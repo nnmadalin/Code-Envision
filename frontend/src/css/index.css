@@ -35,3 +35,7 @@ body, html{
   overflow: auto;
   background-color: #818FB4;
 }
+.Toastify{
+  position: absolute!important;
+  z-index: 999999999;
+}

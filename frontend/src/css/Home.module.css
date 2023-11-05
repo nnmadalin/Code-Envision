@@ -109,6 +109,12 @@
 .menu .middle .titleSpecial5::before{
    width: calc(100% - 100px);
 }
+.menu .middle .titleSpecial6::before{
+   width: calc(100% - 110px);
+}
+.menu .middle .titleSpecial7::before{
+   width: calc(100% - 110px);
+}
 .menu .middle .info{
    max-width: 100%;
    display: flex;

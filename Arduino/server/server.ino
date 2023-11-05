@@ -6,19 +6,12 @@
 #include "Crypto.h"
 #include "AESLib.h"
 
-
-
 #define DHTPIN 19
 #define DHTTYPE DHT11
 #define MQPIN 34
 #define  POLpin1 23
 #define  POLpin2 22
 
-byte key[16] = {'h', 'q', 'z', '2', 'q', 'b', '3', '1', '8', '1', 'y', 'q', 'b', 'x', 'i', 'r'};
-
-DHT dht(DHTPIN, DHTTYPE);
-
-AESLib aes;
 
 
 unsigned long duration1;
@@ -31,8 +24,17 @@ float ratio1 = 0;
 float ratio2 = 0;
 float concentration1 = 0;
 float concentration2 = 0;
-
 String output;
+
+
+
+byte key[16] = {'h', 'q', 'z', '2', 'q', 'b', '3', '1', '8', '1', 'y', 'q', 'b', 'x', 'i', 'r'};
+
+
+
+DHT dht(DHTPIN, DHTTYPE);
+
+AESLib aes;
 
 Preferences preferences;
 
@@ -45,18 +47,14 @@ void setup() {
   dht.begin();
   Serial.begin(9600); 
 
-  pinMode(MQPIN, OUTPUT); 
-  pinMode(18,INPUT);
-  pinMode(5,INPUT);
+  pinMode(MQPIN, OUTPUT);
 
   preferences.begin("credentials", false);
-  //preferences.putString("token", "aZaV6wLfhEN4AdZXAlZ8PZMhw1rbHRn2C2OdkuA785RfrM02bKkUt95Bu1oB0YZX2M4n4atBfofdVxpWOVuqwLJqmmsOpzAdWVdUD2PuYyL4EboOGNnyedLOeZjIrHzr7Bt6qkEKJ0WvXuUDoJNTU0W2IGaByLcVg5h8hM0b8T5kdI9VOCspsF5ApmIIg8x5Ray71HwTNXy4rEZJoNFuteX5iwkcnXZQUlrM1PkDjQQWMlGKVeTw6YCGAfygEgj3"); 
 
   starttime = millis();
 
   WiFi.begin(ssid, password);
   Serial.println("Conectare");
-
   while(WiFi.status() != WL_CONNECTED){
     Serial.println(" - asteapta");
     delay(100);
@@ -70,8 +68,6 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   Serial.println("");Serial.println("");  
-
-  //pol();
 }
 
 

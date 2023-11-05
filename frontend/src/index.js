@@ -11,7 +11,7 @@ root.render(
 <Router>
   <Routes>
     <Route path='/' element={<><Navbar /> <Home /></>} />
-    <Route path='/admin' element={<><Admin /></>} />
+    <Route path='/admin' element={<><Navbar /><Admin /></>} />
     <Route path='/*' element={<><Navbar /> <Home /></>} />
   </Routes>
 

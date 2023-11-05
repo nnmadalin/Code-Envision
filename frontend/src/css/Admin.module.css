@@ -1,7 +1,7 @@
 .main{
    padding: 20px 20px;
    width: calc(100% - 40px);
-   height: calc(100% - 40px);
+   height: calc(100% - 120px);
    background-color: #16292F;
 
    display: flex;
@@ -11,7 +11,7 @@
 .mainPage{
    padding: 20px 20px;
    width: calc(100% - 40px);
-   height: calc(100% - 40px);
+   height: calc(100% - 120px);
    background-color: #16292F;
 
    display: flex;

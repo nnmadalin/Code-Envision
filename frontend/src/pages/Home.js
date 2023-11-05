@@ -18,11 +18,13 @@ function Home() {
   const[dataSourceChart2, setDataSourceChart2] = useState([]);
   const[dataSourceChart3, setDataSourceChart3] = useState([]);
   const[dataSourceChart4, setDataSourceChart4] = useState([]);
+  const[dataSourceChart5, setDataSourceChart5] = useState([]);
+  const[dataSourceChart6, setDataSourceChart6] = useState([]);
 
   const[lastPM10, setlastPM10] = useState(0);
   const[lastPM25, setlastPM25] = useState(0);
   const[CAQIFront, setCAQIFront] = useState(0);
-  const[c02Front, setC02Front] = useState(0);
+  const[h2Front, setH2Front] = useState(0);
   const[tempFront, settempFront] = useState(0);
   const[humFront, sethumFront] = useState(0);
   const[streetFront, setstreetFront] = useState(undefined);
@@ -38,11 +40,6 @@ function Home() {
     [44.9937, 26.0671]
   ];
 
-
-
-  const handleZoomToCoordinates = (coordinates, zoomLevel) => {
-    mapRef.current.setView(coordinates, zoomLevel); 
-  };
 
   useEffect(() => {
     const fetchDevice = async () => {
@@ -150,7 +147,7 @@ function Home() {
     var IAQIs = [];
     var hum = 0, counter = 0;
     var temp = 0;
-    var co2 = 0;
+    var h2 = 0;
 
     dataFetch && dataFetch.map((object, key ) => {
       if(object.uuid = uuid){
@@ -179,7 +176,7 @@ function Home() {
 
           hum += parseInt(object2.humidity);
           temp += parseInt(object2.temperature);
-          co2 += parseInt(object2.mqvalue);
+          h2 += parseInt(object2.mqvalue);
           counter++;
         }
       }
@@ -188,14 +185,14 @@ function Home() {
     
 
     for(let i = 0; i < 24; i++){
-      let tempmed = 0, hummed = 0, co2med = 0, coutnerchart = 0;
+      let tempmed = 0, hummed = 0, h2med = 0, pm10 = 0, pm25 = 0, coutnerchart = 0;
       let IAQIschart = [];
       data && data.map((object2, key2 ) => {
         var date = new Date(object2.added_on);
         if(object2.uuid === uuid){
           if(date.getFullYear() === (new Date()).getFullYear() &&
             date.getMonth() === (new Date()).getMonth() &&
-            date.getDate() === (new Date()).getDate() - 1 &&
+            date.getDate() === (new Date()).getDate() &&
             date.getHours() === i
             )
           {
@@ -207,27 +204,34 @@ function Home() {
 
             hummed += parseInt(object2.humidity);
             tempmed += parseInt(object2.temperature);
-            co2med += parseInt(object2.mqvalue);
+            h2med += parseInt(object2.mqvalue);
+
+            pm10 += parseInt(object2.pm1);
+            pm25 += parseInt(object2.pm25);
             coutnerchart++;
           }
         }
       });
       hummed /= coutnerchart;
       tempmed /= coutnerchart;
-      co2med /= coutnerchart;
+      h2med /= coutnerchart;
+      pm10 /= coutnerchart;
+      pm25 /= coutnerchart;
 
       const CAQIchart = calculateCAQI(IAQIschart);
       setDataSourceChart1(prevData => [...prevData, {value: CAQIchart, hours: i}]);
       setDataSourceChart2(prevData => [...prevData, {value: tempmed, hours: i}]);
       setDataSourceChart3(prevData => [...prevData, {value: hummed, hours: i}]);
-      setDataSourceChart4(prevData => [...prevData, {value: co2med, hours: i}]);
+      setDataSourceChart4(prevData => [...prevData, {value: h2med, hours: i}]);
+      setDataSourceChart5(prevData => [...prevData, {value: pm10, hours: i}]);
+      setDataSourceChart6(prevData => [...prevData, {value: pm25, hours: i}]);
     }
 
     hum /= counter;
     temp /= counter;
-    co2 /= counter;
+    h2 /= counter;
 
-    setC02Front(parseFloat(co2));
+    setH2Front(parseFloat(h2));
     sethumFront(parseFloat(hum));
     settempFront(parseFloat(temp));
     
@@ -263,7 +267,7 @@ function Home() {
               if(object2.uuid === object.uuid){
                 if(date.getFullYear() === (new Date()).getFullYear() &&
                   date.getMonth() === (new Date()).getMonth() &&
-                  date.getDate() === (new Date()).getDate() - 1)
+                  date.getDate() === (new Date()).getDate())
                 {
                   const IAQI_PM10 = calculateIAQI_PM10(parseInt(object2.pm1) / 1000);
                   const IAQI_PM25 = calculateIAQI_PM25(parseInt(object2.pm25)  / 1000);
@@ -324,8 +328,8 @@ function Home() {
                     </div>
                     <div className={styles.section}>
                       <div className={styles.info}>
-                        <p>CO<sub>2</sub></p>
-                        <p>{Number(c02Front).toFixed(2)}</p>
+                        <p>H<sub>2</sub></p>
+                        <p>{Number(h2Front).toFixed(2)}</p>
                       </div>
                     </div>
                     <div className={styles.sectionSpecial}>
@@ -386,13 +390,43 @@ function Home() {
                     </div>
 
                     <div className={styles.section}>
-                      <h3 className={styles.title + " " + styles.titleSpecial5}>Grafic CO2</h3>
+                      <h3 className={styles.title + " " + styles.titleSpecial5}>Grafic H2</h3>
                       <div className={styles.info}>
                       <Chart className={styles.chart} dataSource={dataSourceChart4}>
                         <Series
                           valueField="value"
                           argumentField="hours"
-                          name="Co2"
+                          name="H2"
+                          type="bar"
+                          color="#818FB4" />
+                        <ArgumentAxis showLabels={true} tickInterval={1}/> 
+                      </Chart>
+                      </div>
+                    </div>
+
+                    <div className={styles.section}>
+                      <h3 className={styles.title + " " + styles.titleSpecial6}>Grafic PM10</h3>
+                      <div className={styles.info}>
+                      <Chart className={styles.chart} dataSource={dataSourceChart5}>
+                        <Series
+                          valueField="value"
+                          argumentField="hours"
+                          name="PM10"
+                          type="bar"
+                          color="#818FB4" />
+                        <ArgumentAxis showLabels={true} tickInterval={1}/> 
+                      </Chart>
+                      </div>
+                    </div>
+
+                    <div className={styles.section}>
+                      <h3 className={styles.title + " " + styles.titleSpecial7}>Grafic PM25</h3>
+                      <div className={styles.info}>
+                      <Chart className={styles.chart} dataSource={dataSourceChart6}>
+                        <Series
+                          valueField="value"
+                          argumentField="hours"
+                          name="PM25"
                           type="bar"
                           color="#818FB4" />
                         <ArgumentAxis showLabels={true} tickInterval={1}/> 
