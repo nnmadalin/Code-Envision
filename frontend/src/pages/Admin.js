@@ -75,7 +75,7 @@ function Admin() {
          return;
       }
       try {
-         const response = await fetch('http://172.20.10.4:3003/login', {
+         const response = await fetch('http://127.0.0.1:3003/login', {
             method: 'POST',
             headers: {
                'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ function Admin() {
       
    useEffect(() => {
       const getDevices = async () => {
-         const response = await fetch('http://172.20.10.4:3003/devices', {
+         const response = await fetch('http://127.0.0.1:3003/devices', {
             method: 'GET',
             headers: {
                'Content-Type': 'application/json',
@@ -167,7 +167,7 @@ function Admin() {
    const delete_device = async (e) => {
       var answer = window.confirm("Esti sigur ca vrei sa stergi dispozitivul?");
       if(answer){
-         const response = await fetch('http://172.20.10.4:3003/devices?uuid=' + e.target.value, {
+         const response = await fetch('http://127.0.0.1:3003/devices?uuid=' + e.target.value, {
             method: 'DELETE',
             headers: {
                'Content-Type': 'application/json',
@@ -189,7 +189,7 @@ function Admin() {
    const update_device = async (e) => {
       var answer = window.confirm("Esti sigur ca vrei sa modifici dispozitivul?");
       if(answer){
-         const response = await fetch('http://172.20.10.4:3003/devices?uuid=' + e.target.value, {
+         const response = await fetch('http://127.0.0.1:3003/devices?uuid=' + e.target.value, {
             method: 'PUT',
             headers: {
                'Content-Type': 'application/json',

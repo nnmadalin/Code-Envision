@@ -44,7 +44,7 @@ function Home() {
   useEffect(() => {
     const fetchDevice = async () => {
       try {
-        const response = await fetch('http://172.20.10.4:3003/devices',{
+        const response = await fetch('http://127.0.0.1:3003/devices',{
           method: 'GET',
         });
         const jsonData = await response.json();
@@ -55,7 +55,7 @@ function Home() {
     };
     const fetchData = async () => {
       try {
-        const response = await fetch('http://172.20.10.4:3003/values',{
+        const response = await fetch('http://127.0.0.1:3003/values',{
           method: 'GET',
         });
         const jsonData = await response.json();
@@ -162,9 +162,10 @@ function Home() {
       var date = new Date(object2.added_on);
       
       if(object2.uuid === uuid){
-        if(date.getFullYear() === (new Date()).getFullYear() &&
-          date.getMonth() === (new Date()).getMonth() &&
-          date.getDate() === (new Date()).getDate() - 1)
+        //date.getFullYear() === (new Date()).getFullYear() &&
+        //date.getMonth() === (new Date()).getMonth() &&
+        //date.getDate() === (new Date()).getDate() - 1
+        if(true)
         {
           const IAQI_PM10 = calculateIAQI_PM10(parseInt(object2.pm1) / 1000);
           const IAQI_PM25 = calculateIAQI_PM25(parseInt(object2.pm25)  / 1000);
@@ -195,7 +196,7 @@ function Home() {
           //date.getMonth() === (new Date()).getMonth() &&
           //date.getDate() === (new Date()).getDate()
 
-          if(true)
+          if(date.getHours() === i)
           {
             
             const IAQI_PM10 = calculateIAQI_PM10(parseInt(object2.pm1) / 1000);
@@ -280,6 +281,7 @@ function Home() {
               }
             });
             
+            console.log(IAQIs);
             if(IAQIs.length != 0){
 
               const CAQI = calculateCAQI(IAQIs);
