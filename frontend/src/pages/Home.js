@@ -137,6 +137,7 @@ function Home() {
     setMenuUUID(uuid);
     setIsActiveMenu(true);
     load_menu_fetch(uuid);
+    console.log(uuid);
   };
 
   const handleCloseMenu = () => {
@@ -150,7 +151,7 @@ function Home() {
     var h2 = 0;
 
     dataFetch && dataFetch.map((object, key ) => {
-      if(object.uuid = uuid){
+      if(object.uuid === uuid){
         setstreetFront(object.street);
         setLatFront(object.lat);
         setLongFront(object.longi);
@@ -190,11 +191,11 @@ function Home() {
       data && data.map((object2, key2 ) => {
         var date = new Date(object2.added_on);
         if(object2.uuid === uuid){
-          if(date.getFullYear() === (new Date()).getFullYear() &&
-            date.getMonth() === (new Date()).getMonth() &&
-            date.getDate() === (new Date()).getDate() &&
-            date.getHours() === i
-            )
+          //date.getFullYear() === (new Date()).getFullYear() &&
+          //date.getMonth() === (new Date()).getMonth() &&
+          //date.getDate() === (new Date()).getDate()
+
+          if(true)
           {
             
             const IAQI_PM10 = calculateIAQI_PM10(parseInt(object2.pm1) / 1000);
@@ -265,9 +266,11 @@ function Home() {
             data && data.map((object2, key2 ) =>{
               var date = new Date(object2.added_on);
               if(object2.uuid === object.uuid){
-                if(date.getFullYear() === (new Date()).getFullYear() &&
-                  date.getMonth() === (new Date()).getMonth() &&
-                  date.getDate() === (new Date()).getDate())
+                //date.getFullYear() === (new Date()).getFullYear() &&
+                //date.getMonth() === (new Date()).getMonth() &&
+                //date.getDate() === (new Date()).getDate()
+
+                if(true)
                 {
                   const IAQI_PM10 = calculateIAQI_PM10(parseInt(object2.pm1) / 1000);
                   const IAQI_PM25 = calculateIAQI_PM25(parseInt(object2.pm25)  / 1000);
